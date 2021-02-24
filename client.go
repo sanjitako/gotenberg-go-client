@@ -127,7 +127,7 @@ func (c *Client) Store(req Request, dest string) error {
 	return writeNewFile(dest, resp.Body)
 }
 
-func (c *Client) StoreBytes(req Request, out bytes.Buffer) error {
+func (c *Client) StoreBytes(req Request, out *bytes.Buffer) error {
 	if hasWebhook(req) {
 		return errors.New("cannot use Store method with a webhook")
 	}
