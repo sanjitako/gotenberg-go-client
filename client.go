@@ -127,6 +127,25 @@ func (c *Client) Store(req Request, dest string) error {
 	return writeNewFile(dest, resp.Body)
 }
 
+func (c *Client) StoreBytes(req Request, out bytes.Buffer) error {
+	if hasWebhook(req) {
+		return errors.New("cannot use Store method with a webhook")
+	}
+	resp, err := c.Post(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("failed to generate the result PDF")
+	}
+	if _, err := out.ReadFrom(resp.Body); err != nil {
+		return err
+	}
+	return nil
+}
+
 func hasWebhook(req Request) bool {
 	webhookURL, ok := req.formValues()[webhookURL]
 	if !ok {
